@@ -1,0 +1,42 @@
+For results.json go to d20 frontend and find ResultsPage.tsx line 330
+
+// Convert data to JSON format
+const jsonData = JSON.stringify(sortedResults, null, 2); 
+
+// Save the JSON data to a file
+fs.writeFileSync('output.json', jsonData, 'utf8');
+
+
+For voters.json go to polls-api-service application
+
+in the VoterResource.php add in an id value:
+line 22: 'id' => $record->id,
+
+and in api.php routes file, update the route function
+
+Route::get('/voters', function (Request $request) {
+    $voters = Voter::get();
+        $jsonData = json_encode($voters, JSON_PRETTY_PRINT);
+
+        $filePath = storage_path('app/json/voters.json');
+    
+        file_put_contents($filePath, $jsonData);
+    return response()->json(VoterResource::collection($voters));
+});
+
+For votes.json go to polls-api-service application and in api.php routes file
+
+Route::get('/votes', function (Request $request) {
+
+    $votes = DB::table('votes')->join('works', 'votes.work_id', 'works.id')
+    ->join('voters', 'votes.voter_id', 'voters.id')
+    ->select('votes.id', 'votes.voter_id', 'votes.order', 'works.uuid', 'voters.type')->where('votes.order', '<', '11')->get(); 
+
+    $jsonData = json_encode($votes, JSON_PRETTY_PRINT);
+
+    $filePath = storage_path('app/json/votes.json');
+
+    file_put_contents($filePath, $jsonData);
+
+    return response()->json('saved');
+});
