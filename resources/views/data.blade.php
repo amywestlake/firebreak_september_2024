@@ -35,6 +35,10 @@
         </section>
 
         <section class="mb-8">
+            <div id="yearChart" class="w-full h-96 bg-white shadow-md rounded-md"></div>
+        </section>
+
+        <section class="mb-8">
             <div id="mapChart" class="w-full h-96 bg-white shadow-md rounded-md"></div>
         </section>
 
@@ -137,6 +141,68 @@
             });
 
         })();
+
+        // Films by decade chart
+        var yearData = {!! json_encode($filmsByYear) !!};
+
+        // Extracting the decades and the corresponding total films
+        var categories = yearData.map(function(item) {
+            return item.year; 
+        });
+
+        // Get the total films for that decade
+        var data = yearData.map(function(item) {
+            return item.total_films; 
+        });
+
+        // Creating the Highcharts bar chart
+        Highcharts.chart('yearChart', {
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Years with the most films',
+                align: 'left'
+            },
+            xAxis: {
+                categories: categories,
+                title: {
+                    text: null
+                },
+                gridLineWidth: 1,
+                lineWidth: 0
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of Films',
+                    align: 'high'
+                },
+                labels: {
+                    overflow: 'justify'
+                },
+                gridLineWidth: 0
+            },
+            tooltip: {
+                valueSuffix: ' films' 
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: '50%',
+                    dataLabels: {
+                        enabled: true
+                    },
+                    groupPadding: 0.1
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            series: [{
+                name: 'Films', 
+                data: data 
+            }]
+        });
 
         // Films by decade chart
         var decadesData = {!! json_encode($filmsByDecade) !!};
